@@ -14,15 +14,16 @@ typedef struct SNAKE //蛇身的一个节点
 {
     int x;
     int y;
-    struct SNAKE *next;
+    struct SNAKE *next; // 数据结构 链表 [ o -> ] [ o -> ] [ o-> ] 
 }snake;
  
 //全局变量//
-int score=0,add=10;//总得分与每次吃食物得分。
-int status,sleeptime=200;//每次运行的时间间隔
-snake *head, *food;//蛇头指针，食物指针
-snake *q;//遍历蛇的时候用到的指针
-int endgamestatus=0; //游戏结束的情况，1：撞到墙；2：咬到自己；3：主动退出游戏。
+int score=0, DEFAULT_ADD_VALUE = 10;//总得分与每次吃食物得分。
+int STATUS,sleeptime=200;//每次运行的时间间隔
+snake *HEAD ,  *food;//蛇头指针，食物指针
+snake *HEAD2
+snake *CURRENT_SNAKE;//遍历蛇的时候用到的指针
+int endgameSTATUS=0; //游戏结束的情况，1：撞到墙；2：咬到自己；3：主动退出游戏。
  
 //声明全部函数//
 void Pos();
@@ -39,6 +40,7 @@ void gamestart();
  
 void Pos(int x,int y)//设置光标位置
 {
+    int STATUS;
     COORD pos;
 	HANDLE hOutput;
     pos.X=x;
@@ -196,8 +198,10 @@ void cantcrosswall2()//不能穿墙2
     }
 }
  
-void snakemove()//蛇前进,上U,下D,左L,右R
+void snakemove(snake *head, int status)//蛇前进,上U,下D,左L,右R
 {
+
+    int add = DEFAULT_ADD_VALUE;
 	snake * nexthead;
     cantcrosswall();
     
@@ -602,21 +606,39 @@ void gamecircle()//控制游戏
         printf("得分：%d  ",score);
         Pos(64,11);
         printf("每个食物得分：%d分",add);
+        snake1_move=0
+        snake2_move=0
         if(GetAsyncKeyState(VK_UP) && status!=D)
         {
-            status=U;
+            status=U;  snake1_move=1;
         }
         else if(GetAsyncKeyState(VK_DOWN) && status!=U)
         {
-            status=D;
+            status=D;  snake1_move=1
         }
         else if(GetAsyncKeyState(VK_LEFT)&& status!=R)
         {
-            status=L;
+            status=L;  snake1_move=1
         }
         else if(GetAsyncKeyState(VK_RIGHT)&& status!=L)
         {
-            status=R;
+            status=R;  snake1_move=1
+        }
+        if(GetAsyncKeyState(VK_A) && status!=D)
+        {
+            status=U; snake2_move=1
+        }
+        else if(GetAsyncKeyState(VK_S) && status!=U)
+        { 
+            status=D; snake2_move=1
+        }
+        else if(GetAsyncKeyState(VK_C)&& status!=R)
+        {
+            status=L; snake2_move=1
+        }
+        else if(GetAsyncKeyState(VK_D)&& status!=L)
+        {
+            status=R; snake2_move=1
         }
         else if(GetAsyncKeyState(VK_SPACE))
         {
@@ -628,7 +650,13 @@ void gamecircle()//控制游戏
             break;
         }
         Sleep(sleeptime);
-        snakemove();
+
+
+        //增加了 两条蛇的控制 
+        if (snake1_move == 1)
+            snakemove(HEAD1, status);
+        if (snake2_move == 1)
+            snakemove(HEAD2, status);
     }
 }
 void gamecircle2()//控制游戏        
@@ -812,7 +840,7 @@ void explain()
 	printf("                                 2.两个玩家模式：玩家二字母键W, S, A, D 分别控制上、下、左、右\n\n");
 	printf("                                                                            按下回车进入游戏地图选择\n");
 	getch();
-	map();
+	// map();
 }
 void menu()
 {
@@ -843,4 +871,9 @@ int main()
 {
 	menu();
 return 0;
+}
+
+int plus(int a, int b)
+{
+    return a + b
 }
